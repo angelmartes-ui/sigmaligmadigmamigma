@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+        
+        button {
+            padding: 20px;
+            font-size: 20px;
+            background-color: #61dafb;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
+        button:hover {
+            background-color: #21a1f1;
+        }
+
+        .upgrades {
+            margin-top: 20px;
+        }
+
+        .upgrade-button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4caf50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upgrade-button:hover {
+            background-color: #45a049;
+        }
+
+        .stats {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Clicker Game</h1>
+    <button id="clickButton">Click me!</button>
+    
+    <div class="upgrades">
+        <button class="upgrade-button" id="upgradeClick">Upgrade Click (Cost: 10)</button>
+        <button class="upgrade-button" id="autoclick">Auto Clicker (Cost: 50)</button>
+    </div>
+    
+    <div class="stats">
+        <p>Total Clicks: <span id="totalClicks">0</span></p>
+        <p>Clicks Per Second: <span id="clicksPerSec">0</span></p>
+    </div>
+
+    <script>
+        let totalClicks = 0;
+        let clicksPerSecond = 0;
+        let clickPower = 1;
+        let autoClickCost = 50;
+        let upgradeCost = 10;
+        let autoClickInterval;
+        let isAutoclicking = false;
+
+        const clickButton = document.getElementById('clickButton');
+        const totalClicksElement = document.getElementById('totalClicks');
+        const clicksPerSecElement = document.getElementById('clicksPerSec');
+        const upgradeClickButton = document.getElementById('upgradeClick');
+        const autoclickButton = document.getElementById('autoclick');
+        
+        clickButton.addEventListener('click', () => {
+            totalClicks += clickPower;
+            updateStats();
+        });
+
+        upgradeClickButton.addEventListener('click', () => {
+            if (totalClicks >= upgradeCost) {
+                totalClicks -= upgradeCost;
+                clickPower++;
+                upgradeCost *= 2; // Cost increases each time you buy
+                upgradeClickButton.innerText = `Upgrade Click (Cost: ${upgradeCost})`;
+                updateStats();
+            }
+        });
+
+        autoclickButton.addEventListener('click', () => {
+            if (totalClicks >= autoClickCost && !isAutoclicking) {
+                totalClicks -= autoClickCost;
+                isAutoclicking = true;
+                autoClickInterval = setInterval(() => {
+                    totalClicks += 1; // Auto click gives 1 click per interval
+                    updateStats();
+                }, 1000); // Auto click every second
+                autoclickButton.disabled = true; // Disable button after purchase
+                updateStats();
+            }
+        });
+
+        function updateStats() {
+            totalClicksElement.innerText = totalClicks;
+            clicksPerSec = isAutoclicking ? 1 : 0; // Only show autoclick for now
+            clicksPerSecElement.innerText = clicksPerSec;
+        }
+
+        // Keep updating clicks per second display if the user is clicking
+        let clicksSinceLastUpdate = 0;
+        setInterval(() => {
+            clicksPerSec = clicksSinceLastUpdate;
+            clicksPerSecElement.innerText = clicksPerSec;
+            clicksSinceLastUpdate = 0; // Reset after showing
+        }, 1000);
+
+        clickButton.addEventListener('click', () => {
+            clicksSinceLastUpdate += clickPower;
+        });
+
+    </script>
+
+</body>
+</html>
